@@ -5,7 +5,7 @@ def blocked(data, outputfile):
 	f = open(data)
 	out_f = open(outputfile, 'w')
 	tracker = ThreeStrikesYoureOut()
-	
+
 	for raw_log in f:
 		log = Log(raw_log)
 		dt = TimeFormatter(log.time).dt

@@ -22,6 +22,11 @@ class Log(object):
 		self.success = False if (self.reply[0] == '5' or self.reply[0] == '4') else True
 		self.isGet = True if self.http_req.split(" ")[0] == "GET" else False
 		self.resource = self.http_req.split(" ")[1] if self.success else None
+		if not self.isGet and self.resource == None:
+			try:
+				self.resource = self.http_req.split(" ")[1]
+			except:
+				pass
 
 	def __str__(self):
 		return self.host + '**' + self.time + '**' + self.http_req + '**' + self.reply + '**' + str(self.bytes)
@@ -60,13 +65,12 @@ class TimeFormatter(object):
 		self.year = aux[2].split(":")[0]
 		self.hour = auxx[1]
 		self.minute = auxx[2]
-		self.second = auxxx[0]
+		self.second = auxxx[0][:2]
 		self.timezone = auxxx[1]
 
 		complete_time_string = self.day+"-"+self.month+"-"+self.year+" "+self.hour+":"+self.minute+":"+self.second
 		format_string = "%d-%b-%Y %H:%M:%S"
 		self.dt = datetime.strptime(complete_time_string, format_string)
-
 #####FEATURE 4
 
 class TimeOut(object):
@@ -101,7 +105,7 @@ class ThreeStrikesYoureOut(object):
 				del self.timeouts[host]
 				self.strike_one[host] = dt
 		elif host in self.strike_two:
-			diff = self.get_time_difference(dt, self.strike_two[host])
+			diff = self.get_time_difference(self.strike_two[host], dt)
 
 			if diff < PENALTY_TIME:
 				time_out_ending = dt + timedelta(0, FIVE_MINUTES)
@@ -111,7 +115,7 @@ class ThreeStrikesYoureOut(object):
 
 			del self.strike_two[host]
 		elif host in self.strike_one:
-			diff = self.get_time_difference(dt, self.strike_one[host])
+			diff = self.get_time_difference(self.strike_one[host], dt)
 			if diff < PENALTY_TIME:
 				self.strike_two[host] = self.strike_one[host]
 				del self.strike_one[host]
